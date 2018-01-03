@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.container{
+			width:1000px;
+			height:330px;
+			margin:0 auto;
+			position: relative;
+			overflow:hidden;
+		}
+		.my-img{
+			width:400%;
+			
+		}
+		.my-img a{
+			display: block;
+			float:left;
+			width:1000px;
+		}
+		.my-img img{
+			display: block;
+			width:1000px;
+			float:left;
+			z-index: -1;
+		}
+		.my-lead{
+			//margin:0 auto;
+			width:30px;
+			height:30px;
+			postion:fixed;
+			top:200px;
+			z-index: 2;
+		}
+		.lead-point{
+			float:left;
+			width:10px;
+			height:10px;
+			border-radius: 10px;
+			margin:10px ;
+			background:black;
+			position:relative;
+			top:-35px;
+			cursor: pointer;
+		}
+		.choose-point{
+			background:red;
+		}
+	</style>
+	<script src="jquery.js"></script>
+	<link rel="stylesheet" href="reset.css">
+</head>
+<body>
+	<div class="container">
+		<div class="my-img clearfix"></div>
+		<div class="my-lead clearfix"></div>
+	</div>
+	<script>
+	$(function(){
+		var i;
+		var imgSource;//JS添加图片
+		var aSource;//JS添加a
+		var leadPoint;//JS添加导航点
+		var pageAll=3;//总共页，可更改
+		var pageNow=0;//当前页
+		var slideMove;
+		var slideTo;//setInterval
+		var xStart,xThen,xChange;//记录鼠标开始值，后来值，改变值
+		var toRight=true;//判断向右向左移动
+		var oMargin,leftChange;
+		var manChange=false;
+		//记录是否开始人为拉动广告条
+		for(i=0;i<pageAll+1;i++)
+		{
+			//imgSource="<img src='images/img_1.jpg'/>";
+			/*$("my-img").css({
+				"width":pageAll*"100%"
+			});*/
+			aSource="<a class='my-a'></a>";
+			$(".my-img").append(aSource);
+			$(".my-a").css({
+				"float":"left"
+			});
+			$(".my-a").attr("href","#");
+			imgSource="<img src='images/img_"+i+".jpg'/>";
+			$(".my-img a:eq("+i+")").append(imgSource);
+			
+		}
+		//在".my-img"div中添加a和img
+		for(i=0;i<pageAll;i++)
+		{
+			leadPoint="<div class='lead-point'></div>";
+			$(".my-lead").append(leadPoint);
+			$(".my-lead").css({
+				"width":"+=20px",
+				"margin":"0 auto",
+				"top":"100px"
+			});
+		}
+		$(".lead-point:eq(0)").addClass("choose-point");
+		//在".my-lead"div中添加导航点
+		var slide=function(){
+			$(".my-img").animate({marginLeft:"-=100%"},1000,count);
+		}
+		//自动播放
+		function count(){
+			$(".lead-point:eq("+pageNow+")").removeClass("choose-point");
+			if(toRight){
+				pageNow++;
+			}
+			else{
+				pageNow--;
+				toRight=true;
+			}
+			//判断向左向右
+			if(pageNow==pageAll){
+				$(".my-img").css({
+					"marginLeft":0
+				});
+				pageNow=0;
+			}
+			//如果是最后一张（重复第一张），切换到第一张
+			$(".lead-point:eq("+pageNow+")").addClass("choose-point");
+		}
+		slideTo=setInterval(slide,2000);
+		//每隔一段时间调用滑动函数
+		$(".lead-point").click(function(){
+			$(".my-img").stop(true,false);
+			/*if($(".my-img").is(":animated"))
+			{
+				count();
+			}*/
+			clearInterval(slideTo);
+			if(pageNow==pageAll){
+				pageNow=0;
+			}
+			if(pageNow==$(".lead-point").index(this)){
+				return false;
+			}
+			//$(".lead-point:eq("+pageNow+")").removeClass("choose-point");
+			for(i=0;i<pageAll;i++){
+				if($(".lead-point:eq("+i+")").hasClass("choose-point"))
+					$(".lead-point:eq("+i+")").removeClass("choose-point");
+			}
+			pageNow=$(".lead-point").index(this);
+			//获得当前的导航点
+			slideMove=-pageNow*100;
+			$(".my-img").css({
+				"marginLeft": slideMove +"%"
+			});
+			//切换到点击的那一页
+			$(".lead-point:eq("+pageNow+")").addClass("choose-point");
+			timeAfter=setTimeout(slideTo,4000);
+			slideTo=setInterval(slide,2000);
+
+		})
+		$(".my-a").click(function(){
+			return false;
+		})
+		//阻止轮播元素的默认点击事件
+		$(".my-img").mousedown(function(event){
+			clearInterval(slideTo);
+			xStart=event.pageX;
+			oMargin=$(".my-img").css("marginLeft");
+			event.preventDefault();
+			//阻止鼠标点击默认行为
+
+		})
+		$("body").mouseup(function(event){
+			xThen=event.pageX;
+			xChange=xThen-xStart;
+			if(xChange>0&&pageNow!=0&&pageNow!=pageAll){
+				toRight=false;
+				$(".my-img").stop(false,true).animate({marginLeft:"+=100%"},1000);
+				count();
+			}
+			else if(xChange<0&&pageNow!=pageAll-1){
+				$(".my-img").stop(false,true).animate({marginLeft:"-=100%"},1000);
+				count();
+			}
+			else if(xChange==0){
+				window.location.href="http://www.ouc.edu.cn/";
+			}
+			event.preventDefault();
+			timeAfter=setTimeout(slideTo,4000);
+			slideTo=setInterval(slide,2000);
+		})
+		
+	})
+		
+	</script>
+</body>
+</html>

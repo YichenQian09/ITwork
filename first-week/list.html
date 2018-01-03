@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="reset.css">
+	<style>
+		#container{
+			height:1000px;
+			position:relative;
+		}
+		#showMenu{
+			width:100%;
+			float:left;
+			height:300px;
+			background:rgb(245,245,245);
+			font-size:30px;
+			line-height: 300px;
+			text-align:center;
+			z-index:-1;
+		}
+		ul{
+			width:100px;
+			float:left;
+			display:none;
+			z-index:2;
+			background:white;
+			positon:absolute;
+			border:2px solid #08c;
+			border-radius:5px;
+
+		}
+		ul li{
+			height:30px;
+			line-height: 30px;
+			cursor:pointer;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="showMenu"style="">
+		Right click to see the menu.
+		</div>
+		<ul style="position:fixed">
+			<li id="menuLi1" onclick="popup(this,event)">menu item 1</li>
+			<li id="menuLi2" onclick="popup(this,event)">menu item 2</li>
+			<li id="menuLi3" onclick="popup(this,event)">menu item 3</li>
+		</ul>
+	</div>
+	<script>
+		var addul=document.getElementsByTagName("ul")[0];
+		var ox,oy;
+		var owidth=document.body.clientWidth;
+		var oheight=300;
+		var boolmenu=false;
+		var scrolltotop;
+		window.onresize = function(){
+			owidth=document.body.clientWidth;
+}
+		document.getElementById("showMenu").oncontextmenu=function(e){
+				if(boolmenu){
+					boolmenu=false;
+					return false;
+				} 
+				else{
+					boolmenu=true;
+				}
+				var oevent=e||window.event;
+				if(oevent.pageX||oevent.pageY){
+					ox=oevent.pageX;
+					oy=oevent.pageY;
+				}
+				else{
+					ox=oevent.clientX + document.body.scrollLeft - document.body.clientLeft;
+				 	oy=oevent.clientY + document.body.scrollTop - document.body.clientTop;
+				 	
+				}
+				console.log(oy+" "+ox);
+				document.getElementById("container").appendChild(addul);
+				addul.style.display="block";
+				scrolltotop=document.body.scrollTop;
+				if(owidth-ox>110&&oheight-oy>110)
+				{
+					addul.style.top=(20+oy)+"px";
+					addul.style.left=(10+ox)+"px";
+				}
+				else if(owidth-ox>110){
+					addul.style.top=(oy-110)+"px";
+					addul.style.left=(10+ox)+"px";
+				}
+				else if(oheight-oy>110){
+					addul.style.top=(20+oy)+"px";
+					addul.style.left=(ox-110)+"px";
+				}
+				else{
+					addul.style.top=(oy-110)+"px";
+					addul.style.left=(ox-110)+"px";
+				}
+				console.log(addul.style.top+" "+addul.style.left);
+			oevent.stopPropagation();
+		/*	if(oevent.preventDefault){
+				oevent.preventDefault();
+			}
+			else{
+				oevent.returnValue = false;	
+				e.cancelBubble = true;
+			}*/
+			return false;
+
+				
+			
+		}
+		
+		function popup(obj,event){
+			event.stopPropagation();
+			alert(obj.innerHTML);
+		}
+		document.getElementsByTagName("li")
+		.onclick=function(e){
+			e.stopPropagation();
+		}
+		document.getElementById("container").onclick=function(){
+			console.log(4);
+			addul.style.display="none";
+			boolmenu=false;
+		};
+
+
+	</script>
+</body>
+</html>
